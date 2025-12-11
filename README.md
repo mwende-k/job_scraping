@@ -46,4 +46,4 @@ python main.py
   ```
 
 ## Output
-Results are saved to `eastern_africa_data_jobs.csv` with a summary header and deduped entries.
+Results are saved to `eastern_africa_data_jobs.csv` with a summary header and deduped entries. Also comes with a Stremlit app.
