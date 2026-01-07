@@ -69,3 +69,15 @@ def normalize_url(url):
         return clean_url
     except:
         return url
+
+def is_within_days(date_obj, days):
+    """
+    Checks if a datetime object is within the last N days.
+    Returns True if the date is within the range, False otherwise.
+    """
+    if not date_obj:
+        return True  # If no date, assume it's recent
+        
+    from datetime import timedelta
+    cutoff = datetime.now() - timedelta(days=days)
+    return date_obj >= cutoff

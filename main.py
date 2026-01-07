@@ -116,13 +116,29 @@ def run_scraper(limit=None, days=None):
     df = df[CSV_COLUMNS]
     
     try:
+        # Save to Supabase
+        from db import SupabaseHandler
+        db = SupabaseHandler()
+        
+        # Convert DataFrame to list of dicts
+        jobs_data = df.to_dict(orient='records')
+        
+        # Add created_at timestamp
+        current_time = datetime.now().isoformat()
+        for job in jobs_data:
+            job['created_at'] = current_time
+            
+        db.upsert_jobs(jobs_data)
+        logger.info(f"Successfully saved {len(jobs_data)} jobs to Supabase")
+        
+        # Keep CSV as backup (optional, can remove if pure SaaS)
         # Write summary to file first
         with open(OUTPUT_FILE, 'w') as f:
             f.write(f"# Total Jobs Found: {dedupa_count}, Scrape Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         
         # Append DataFrame
         df.to_csv(OUTPUT_FILE, mode='a', index=False)
-        logger.info(f"Data saved to {OUTPUT_FILE}")
+        logger.info(f"Data also saved to {OUTPUT_FILE} (backup)")
         
         # Preview
         print("\n--- Preview ---")
@@ -130,7 +146,7 @@ def run_scraper(limit=None, days=None):
         print(f"\nTotal: {dedupa_count} jobs saved.")
         
     except Exception as e:
-        logger.error(f"Error saving to CSV: {e}")
+        logger.error(f"Error saving data: {e}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="scrape jobs")
